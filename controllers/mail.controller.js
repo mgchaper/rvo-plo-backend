@@ -55,7 +55,7 @@ function createDocumentAccounts(document) {
 									"Name": 'User'
 								}
 							],
-							"TemplateID": 2067389,
+							"TemplateID": 2515544,
 							"TemplateLanguage": true,
 							"Subject": "Praktijkleerovereenkomst: " + document.name,
 							"Variables": {
