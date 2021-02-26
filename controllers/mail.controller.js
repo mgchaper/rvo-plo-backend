@@ -160,6 +160,7 @@ function sendInvitations(document) {
 
 
     accountsMap.forEach(account => {
+		console.log(account);
         const request = mailjet
 	.post("send", {'version': 'v3.1'})
 	.request({
