@@ -141,10 +141,10 @@ function createSubDocuments(document, account) {
 
 
 function sendInvitations(document) {
-	// const accounts = [];
-	// accounts.push(document.student);
-	// accounts.push(document.educationalInstitution);
-	// accounts.push(document.employer);
+	const accounts = [];
+	accounts.push(document.student);
+	accounts.push(document.educationalInstitution);
+	accounts.push(document.employer);
 
 	// accounts.forEach(account => {
         
@@ -152,11 +152,11 @@ function sendInvitations(document) {
 	// });
 
 
-    const accounts = new Map();
+    // const accounts = new Map();
 
-    accounts.push(document.student);
-    accounts.push(document.educationalInstitution);
-	accounts.push(document.employer);
+    // accounts.push(document.student);
+    // accounts.push(document.educationalInstitution);
+	// accounts.push(document.employer);
 
 
     accounts.forEach(account => {
