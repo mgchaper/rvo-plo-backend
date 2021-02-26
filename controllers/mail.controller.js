@@ -141,15 +141,15 @@ function createSubDocuments(document, account) {
 
 
 function sendInvitations(document) {
-	const accounts = [];
-	accounts.push(document.student);
-	accounts.push(document.educationalInstitution);
-	accounts.push(document.employer);
+	// const accounts = [];
+	// accounts.push(document.student);
+	// accounts.push(document.educationalInstitution);
+	// accounts.push(document.employer);
 
-	accounts.forEach(account => {
+	// accounts.forEach(account => {
         
 
-	});
+	// });
 
 
     const accounts = new Map();
