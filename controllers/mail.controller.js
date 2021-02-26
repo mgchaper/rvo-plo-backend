@@ -152,14 +152,14 @@ function sendInvitations(document) {
 	// });
 
 
-    // const accounts = new Map();
+    const accountsMap = new Map();
 
-    // accounts.push(document.student);
-    // accounts.push(document.educationalInstitution);
-	// accounts.push(document.employer);
+    accountsMap.push(document.student);
+    accountsMap.push(document.educationalInstitution);
+	accountsMap.push(document.employer);
 
 
-    accounts.forEach(account => {
+    accountsMap.forEach(account => {
         const request = mailjet
 	.post("send", {'version': 'v3.1'})
 	.request({
