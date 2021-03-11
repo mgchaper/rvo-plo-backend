@@ -55,7 +55,7 @@ function createDocumentAccounts(document) {
 									"Name": 'User'
 								}
 							],
-							"TemplateID": 2515544,
+							"TemplateID": 2067389,
 							"TemplateLanguage": true,
 							"Subject": "Praktijkleerovereenkomst: " + document.name,
 							"Variables": {
@@ -146,21 +146,17 @@ function sendInvitations(document) {
 	accounts.push(document.educationalInstitution);
 	accounts.push(document.employer);
 
-	// accounts.forEach(account => {
+	accounts.forEach(account => {
         
 
-	// });
+	});
+
+    accounts.push(document.student);
+    accounts.push(document.educationalInstitution);
+	accounts.push(document.employer);
 
 
-    const accountsMap = new Map();
-
-    accountsMap.push(document.student);
-    accountsMap.push(document.educationalInstitution);
-	accountsMap.push(document.employer);
-
-
-    accountsMap.forEach(account => {
-		console.log(account);
+    accounts.forEach(account => {
         const request = mailjet
 	.post("send", {'version': 'v3.1'})
 	.request({

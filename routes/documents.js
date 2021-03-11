@@ -15,7 +15,7 @@ router.get("/status/:id", checkAuth, checkRole(Role.Admin), DocumentController.g
 router.delete("/:id", checkAuth, checkRole(Role.Admin), DocumentController.deleteDocument);
 
 //DIT IS ALLEEN VOOR OM TESTEN, ROUTE MAG NIET ZO OPEN ZIJN
-router.post("/generate/:id", DocumentController.generateDocument);
+router.get("/generate/:id", DocumentController.generateDocument);
 //DIT IS ALLEEN VOOR OM TESTEN, ROUTE MAG NIET ZO OPEN ZIJN
 
 router.get("/pdf/:id", checkAuth, pdf.getCompletePdf);

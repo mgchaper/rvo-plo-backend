@@ -6,17 +6,26 @@ const User = require("../models/user");
 const Role = require('../middleware/role');
 
 exports.createSignature = (req, res, next) => {
-    const url = req.protocol + "://" + req.get("host");
+    // const url = req.protocol + "://" + req.get("host");
+    // const signature = new Signature({
+    //   name: req.body.name,
+    //   function: req.body.function,
+    //   location: req.body.location,
+    //   date: req.body.date,
+    //   imagePath: url + "/images/" + req.file.filename,
+    //   creator: req.userData.userId
+    // });
     const signature = new Signature({
       name: req.body.name,
       function: req.body.function,
       location: req.body.location,
       date: req.body.date,
-      imagePath: url + "/images/" + req.file.filename,
+      imagePath: req.file.filename,
       creator: req.userData.userId
     });
     
-    const updatedPathValues = {$set: {signaturePath: 'images/' + req.file.filename  }}
+    // const updatedPathValues = {$set: {signaturePath: 'images/' + req.file.filename  }}
+    const updatedPathValues = {$set: {signaturePath: req.file.filename  }}
 
     User.findOne({_id: req.userData.userId})
     .then(foundUser => {
@@ -110,4 +119,8 @@ exports.createSignature = (req, res, next) => {
         });
       };
     })
+  };
+
+  exports.uploadSignature = (req, res, next ) => {
+    
   };
