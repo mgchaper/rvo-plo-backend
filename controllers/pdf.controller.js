@@ -1,8 +1,19 @@
 const fs = require('fs');
 const Signature = require('../models/signature');
+const signatureImage = require('../models/signatureimages');
+const mongoose = require('mongoose');
+const GridFsStorage = require('multer-gridfs-storage');
+const Grid = require('gridfs-stream');
 
 //Documentation pdfmake (serverside): 
 // https://pdfmake.github.io/docs/0.1/getting-started/server-side/
+
+const conn = mongoose.createConnection(process.env.MONGO_URL);
+conn.once('open', () => {
+    // Init stream
+    gfs = Grid(conn.db, mongoose.mongo);
+    gfs.collection('signatureImages');
+  });
 
 const fonts = {
     Roboto: {
@@ -20,8 +31,12 @@ function generatePdf(
     document, 
     studentDocument,
     educationalInstitutionDocument, 
-    employerDocument
+    employerDocument,
+    studentSignature,
+    educationalInstitutionSignature,
+    employerSignature
     ) {
+
         var docDefinition = {
             content: [
                 '\n\n\n\n\n\n\n',
@@ -258,7 +273,7 @@ function generatePdf(
                 {text: 'Plaats: ' + studentDocument.city},
                 {text: 'Datum: ' + new Date().toLocaleDateString()},
                 {text: 'Handtekening: \n\n\n\n'},
-                {image: studentDocument.signaturePath,
+                {image: studentSignature,
                 width: 200 },
                 {text: 'Onderwijsinstelling', style:'subheader'},
                 {text: ', in deze rechtsgeldig vertegenwoordigd door:\n\n'},
@@ -267,7 +282,7 @@ function generatePdf(
                 {text: 'Plaats: ' + educationalInstitutionDocument.location},
                 {text: 'Datum: ' + new Date().toLocaleDateString()},
                 {text: 'Handtekening: \n\n\n\n'},
-                {image: educationalInstitutionDocument.signaturePath,
+                {image: educationalInstitutionSignature,
                 width: 200 },
                 {text: 'Praktijk biedende organistatie', style:'subheader'},
                 {text: ', in deze rechtsgeldig vertegenwoordigd door:\n\n'},
@@ -276,7 +291,7 @@ function generatePdf(
                 {text: 'Plaats: '},
                 {text: 'Datum: ' + new Date().toLocaleDateString()},
                 {text: 'Handtekening: \n\n'},
-                {image: employerDocument.signaturePath,
+                {image: employerSignature,
                 width: 200 },
                 {text: 'De praktijk biedende organisatie, de onderwijsinstelling en de student ontvangen een door alle partijen getekende versie van de overeenkomst.'}
                 
@@ -312,9 +327,21 @@ function generatePdf(
         };
 
         var pdfDoc = printer.createPdfKitDocument(docDefinition);
-        var validFileName = document.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        pdfDoc.pipe(fs.createWriteStream('files/documents/' + validFileName + '_' + document._id + '.pdf'));
-        pdfDoc.end();
+        // var validFileName = document.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        // pdfDoc.pipe(fs.createWriteStream('files/documents/' + validFileName + '_' + document._id + '.pdf'));
+        // pdfDoc.end();
+         var chunks = []
+         var result
+         pdfDoc.on('data', function (chunk) 
+         {
+             chunks.push(chunk)
+            });
+            pdfDoc.on('end', function () {
+                result = Buffer.concat(chunks)
+                return(result)
+            });
+            pdfDoc.end()
+        
 }
 
 const getEmptyPdf = (req, res, next) => {
@@ -330,8 +357,45 @@ const getCompletePdf = (req, res, next) => {
     res.send(data);
 }
 
+function localGetSignature (signaturePath) {
+    gfs.files.findOne({filename: signaturePath}, (err, file) => {
+        if (!file || file.length === 0) {
+            console.log(err);
+        } else {
+            if(file.contentType === "image/jpeg" || file.contentType === "image/png"){
+                const readstream = gfs.createReadStream(file.filename);
+                const bufs = [];
+                readstream.on('data', function (chunk) {
+                    bufs.push(chunk);
+                });
+                readstream.on('end', function () {
+                    const fbuf = Buffer.concat(bufs);
+                    const base64 = fbuf.toString('base64');
+                    return 'data:image/jpeg;base64,' + base64;
+                });
+            }; 
+        };
+    });
+};
+
+const getSignature = (req, res, next) => {
+    gfs.files.findOne({filename: req.params.id}, (err, file) => {
+        if(!file || file.length === 0){
+            return res.status(404).json({err: 'No File Exists'});
+        } else {
+            if(file.contentType === "image/jpeg" || file.contentType === "image/png"){
+                const readstream = gfs.createReadStream(file.filename);
+                readstream.pipe(res);
+            } else {
+                res.status(404).json({err: 'Not an image'});
+            }
+        }
+    });
+};
+
 module.exports = {
     generatePdf,
     getEmptyPdf,
-    getCompletePdf
+    getCompletePdf,
+    getSignature
 };
